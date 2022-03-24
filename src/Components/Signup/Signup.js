@@ -1,18 +1,30 @@
 import React, { useState, useContext } from 'react';
-
 import Logo from '../../olx-logo.png';
 import { FirebaseContext } from '../../store/FirebaseContext';
 import './Signup.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function Signup() {
+  const navigate = useNavigate()
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-const{firebase} = useContext(FirebaseContext)
+  const { firebase } = useContext(FirebaseContext)
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log(firebase)
+    firebase.auth().createUserWithEmailAndPassword(email, password).then((result) => {
+      result.user.updateProfile({ displayName: username })
+      firebase.firestore().collection('users').add({
+        id: result.user.uid,
+        username: username,
+        phone: phone
+      }).then(() => {
+        navigate('/login')
+      })
+
+    });
   }
 
   return (
@@ -29,7 +41,7 @@ const{firebase} = useContext(FirebaseContext)
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             name="name"
-            defaultValue="John"
+          // defaultValue="John"
           />
           <br />
           <label htmlFor="fname">Email</label>
@@ -41,7 +53,7 @@ const{firebase} = useContext(FirebaseContext)
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             name="email"
-            defaultValue="John"
+          // defaultValue="John"
           />
           <br />
           <label htmlFor="lname">Phone</label>
@@ -53,7 +65,7 @@ const{firebase} = useContext(FirebaseContext)
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             name="phone"
-            defaultValue="Doe"
+          // defaultValue="Doe"
           />
           <br />
           <label htmlFor="lname">Password</label>
@@ -65,7 +77,7 @@ const{firebase} = useContext(FirebaseContext)
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             name="password"
-            defaultValue="Doe"
+          // defaultValue="Doe"
           />
           <br />
           <br />
